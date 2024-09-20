@@ -127,6 +127,11 @@
                             ログイン中: {{ user.username }}
                         </span>
                     </li>
+                    {% if not user.line_authorized %}
+                    <li class="nav-item d-lg-block">
+                        <a class="nav-link" href="{% url 'social:begin' 'line' %}">LINE連携はこちら</a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item d-lg-block">
                         <form method="post" action="{% url 'account_system:sign_out' %}" style="display:inline;">
                             {% csrf_token %}
@@ -137,7 +142,7 @@
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'account_system:sign_in' %}">ログインはこちら</a>
+                        <a class="nav-link" href="{% url 'social:begin' 'line' %}">ログインはこちら</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -150,10 +155,17 @@
             {% if user.is_authenticated %}
             <div class="user-info">
                 <p>ログイン中: {{ user.username }}</p>
+                {% if not user.line_authorized %}
+                <p><a href="{% url 'social:begin' 'line' %}">LINE連携はこちら</a></p>
+                {% endif %}
                 <form method="post" action="{% url 'account_system:sign_out' %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-link nav-link">ログアウト</button>
                 </form>
+            </div>
+            {% else %}
+            <div class="user-info">
+                <p><a href="{% url 'social:begin' 'line' %}">ログインはこちら</a></p>
             </div>
             {% endif %}
             <ul class="nav flex-column">
