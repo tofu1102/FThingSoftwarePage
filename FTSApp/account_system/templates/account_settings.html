@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ホームページ</title>
-    <!-- Bootstrap CSS -->
+    <title>アカウント設定</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -15,7 +14,6 @@
             min-height: 100vh;
         }
 
-        /* レイアウト全体をフレックスボックスで制御 */
         .content-wrapper {
             display: flex;
             flex: 1;
@@ -29,15 +27,15 @@
             left: 0;
             height: 100%;
             z-index: 1000;
-            padding-top: 56px; /* ナビバーが重ならないようにするため */
-            overflow-y: auto; /* コンテンツが多いときにスクロールできるように */
+            padding-top: 56px;
+            overflow-y: auto;
             transition: transform 0.3s ease;
         }
 
         main {
-            margin-left: 250px; /* サイドメニュー分の余白を確保 */
+            margin-left: 250px;
             padding: 20px;
-            flex: 1; /* メインコンテンツをフル幅に */
+            flex: 1;
         }
 
         .navbar {
@@ -46,43 +44,29 @@
         }
 
         .navbar-nav .user-info {
-            margin-right: 15px; /* ユーザー名とログアウトボタンの間に余白を追加 */
-            padding-right: 15px; /* 見た目を調整するための余白 */
-            border-right: 1px solid #ddd; /* 区切り線を追加 */
+            margin-right: 15px;
+            padding-right: 15px;
+            border-right: 1px solid #ddd;
         }
 
         @media (max-width: 992px) {
             #sidebarMenu {
-                transform: translateX(-250px); /* デフォルトは非表示 */
+                transform: translateX(-250px);
             }
             #sidebarMenu.show {
-                transform: translateX(0); /* メニュー表示時 */
+                transform: translateX(0);
             }
             main {
                 margin-left: 0;
             }
             #sidebarToggle {
-                display: block; /* 中途半端なサイズで表示する */
+                display: block;
             }
             .navbar-nav .d-lg-block {
-                display: none; /* 大きな画面向けのナビバーの非表示 */
+                display: none;
             }
-        }
 
-        @media (min-width: 993px) {
-            #sidebarToggle {
-                display: none; /* ハンバーガーボタンを非表示 */
-            }
-            #sidebarMenu {
-                transform: translateX(0); /* サイドメニューを表示 */
-            }
-            .navbar-nav .d-lg-block {
-                display: block; /* 大きな画面向けのナビバーを表示 */
-            }
-        }
-
-        /* 小さい画面でのユーザー名とログアウトリンクを表示 */
-        @media (max-width: 992px) {
+            /* サイドバーのユーザー情報表示 */
             #sidebarMenu .user-info {
                 display: block;
                 padding: 15px;
@@ -92,8 +76,19 @@
         }
 
         @media (min-width: 993px) {
+            #sidebarToggle {
+                display: none;
+            }
+            #sidebarMenu {
+                transform: translateX(0);
+            }
+            .navbar-nav .d-lg-block {
+                display: block;
+            }
+
+            /* サイドバーのユーザー情報を非表示 */
             #sidebarMenu .user-info {
-                display: none; /* 大きい画面ではサイドメニューに表示しない */
+                display: none;
             }
         }
 
@@ -170,12 +165,12 @@
             {% endif %}
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">
+                    <a class="nav-link" href="#">
                         ホーム
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'account_system:account_setting' %}">
+                    <a class="nav-link active" aria-current="page" href="#">
                         アカウント設定
                     </a>
                 </li>
@@ -199,21 +194,17 @@
 
         <main>
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center border-bottom">
-                <h1 class="h2">ダッシュボード</h1>
+                <h1 class="h2">アカウント設定</h1>
             </div>
-            <p>ここにメインコンテンツが表示されます。</p>
-            <div class="container">
-                <div class="row">
-                    <div class="col">
-                        <h3>お知らせ</h3>
-                        <p>こちらはダミーのテキストです。後で編集してください。</p>
-                    </div>
-                    <div class="col">
-                        <h3>最近のアクティビティ</h3>
-                        <p>こちらもダミーのテキストです。後で編集してください。</p>
-                    </div>
-                </div>
-            </div>
+
+            <!-- フォームの開始 -->
+            <form method="post">
+                {% csrf_token %}
+                {{ form.username.label_tag }} {{ form.username }}<br><br>
+                <button type="submit" class="btn btn-primary">更新</button>
+            </form>
+            <!-- フォームの終了 -->
+
         </main>
     </div>
 
@@ -223,7 +214,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script>
-        // ハンバーガーメニューの表示切り替え
         document.getElementById('sidebarToggle').addEventListener('click', function () {
             var sidebarMenu = document.getElementById('sidebarMenu');
             var overlay = document.getElementById('overlay');
@@ -231,7 +221,6 @@
             overlay.classList.toggle('show');
         });
 
-        // オーバーレイをクリックしたときにメニューを閉じる
         document.getElementById('overlay').addEventListener('click', function () {
             var sidebarMenu = document.getElementById('sidebarMenu');
             var overlay = document.getElementById('overlay');

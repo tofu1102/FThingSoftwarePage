@@ -5,6 +5,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import TemplateView
 from .forms import LoginForm 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .forms import CustomUserChangeForm
 
 class sign_in(LoginView):
     form_class = LoginForm
@@ -14,8 +17,17 @@ class sign_out(LoginRequiredMixin, LogoutView):
     """ログアウトページ"""
     template_name = 'sign_in.html'
 
+@login_required
 def account_setting(request):
-    template_name = "account_setting.html"
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('account_system:account_setting')  # 情報更新後にリダイレクト
+    else:
+        form = CustomUserChangeForm(instance=request.user)
+
+    return render(request, 'account_settings.html', {'form': form})
     
 
 def index(request):

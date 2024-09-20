@@ -145,7 +145,9 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 #アカウント機能関連
-LOGIN_URL = "/"
+from django.urls import reverse_lazy
+
+LOGIN_URL = reverse_lazy('social:begin', args=['line'])
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_REDIRECT_URL = "/"
 
