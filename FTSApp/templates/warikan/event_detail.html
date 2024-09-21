@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex align-items-center">
+        <h1 class="me-3">{{ event.name }}</h1>
+        <div class="d-flex">
+            {% for member in event.members.all %}
+            <img src="{{ member.icon_url }}" alt="member-icon" class="rounded-circle member-icon me-1">
+            {% endfor %}
+        </div>
+    </div>
+    <p>更新日時: {{ event.updated_at }}</p>
+    <p>{{ event.description }}</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h2>支払い一覧</h2>
+            <ul class="list-group">
+                {% for payment in event.payment_set.all|slice:":5" %}
+                <li class="list-group-item payment-card" data-url="{% url 'warikan:payment_detail' event.uuid payment.uuid %}">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ payment.name }}</h5>
+                            <span class="mx-3"></span>
+                            <span class="badge bg-primary rounded-pill">{{ payment.amount }}円</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <img src="{{ payment.payer.icon_url }}" alt="payer-icon" class="rounded-circle icon-border me-2" width="30">
+                            <span class="fa fa-arrow-right text-primary arrow-icon-list me-2"></span> <!-- 支払い一覧の矢印: 常に右向き -->
+                            <div class="payee-box d-flex">
+                                {% for payee in payment.payee.all %}
+                                <img src="{{ payee.icon_url }}" alt="payee-icon" class="rounded-circle icon-border me-2" width="30">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'warikan:payment_list' event.uuid %}" class="btn btn-link mt-2">全て表示</a>
+        </div>
+        
+        <div class="col-md-6">
+            <h2 class="mt-5 mt-md-0">支払い登録</h2>
+            <form method="post" class="form-container p-4 border rounded bg-light shadow-sm" action="{% url 'warikan:event_detail' event.uuid %}">
+                {% csrf_token %}
+                
+                <div class="row mb-3 align-items-center">
+                    <div class="col-md-5 text-center">
+                        <div class="form-group">
+                            <label for="id_payer">支払った人:</label>
+                            <div class="d-flex align-items-center">
+                                {{ form.payer }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <span class="fa fa-arrow-right text-primary arrow-icon-form"></span> <!-- 支払いフォームの矢印: クラスを分けて管理 -->
+                    </div>
+                    <div class="col-md-5 text-center mt-3 mt-md-0">
+                        <div class="form-group">
+                            <label for="id_payee">支払われた人:</label>
+                            <div class="form-check payee-grid">
+                                {% for choice in form.payee.field.queryset %}
+                                <div class="d-flex align-items-center mb-2 payee-item">
+                                    <input type="checkbox" name="payee" value="{{ choice.pk }}" class="form-check-input me-2" id="payee_{{ choice.pk }}">
+                                    <img src="{{ choice.icon_url }}" alt="icon" class="rounded-circle icon-border me-2" width="30">
+                                    <label for="payee_{{ choice.pk }}" class="form-check-label">{{ choice }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_name">支払い名:</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_amount">金額:</label>
+                    {{ form.amount }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_description">説明:</label>
+                    {{ form.description }}
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">登録する</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-container {
+    max-width: 100%; /* フォームが親コンテナからはみ出さないようにする */
+    overflow: hidden; /* コンテンツがはみ出すのを防ぐ */
+}
+
+.form-group textarea {
+    width: 100%; /* テキストエリアがフォームの幅に合わせる */
+    resize: vertical; /* テキストエリアのリサイズを垂直方向のみに制限 */
+}
+
+.icon-border {
+    border: 1px solid rgba(0, 0, 0, 0.2); /* 薄く黒で縁取り */
+    padding: 2px;
+}
+
+.member-icon {
+    border: 1px solid rgba(0, 0, 0, 0.2); /* 薄く黒で縁取り */
+    padding: 2px;
+    width: 30px; /* アイコンの幅を固定 */
+    height: 30px; /* アイコンの高さを固定 */
+    object-fit: cover; /* 画像が変形しないようにする */
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer; /* カード部分をクリックできるようにする */
+}
+
+.amount-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.payment-card:hover {
+    background-color: #f8f9fa;
+}
+
+.arrow-icon-list {
+    transform: rotate(0deg); /* 支払い一覧の矢印は常に右向き */
+}
+
+.arrow-icon-form {
+    transform: rotate(0deg); /* 支払いフォームの矢印は画面の向きに合わせて変更 */
+}
+
+.payee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* スペースに応じて列数を調整 */
+    gap: 10px; /* グリッド項目の間隔 */
+}
+
+.payee-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+@media (max-width: 768px) {
+    .arrow-icon-form {
+        transform: rotate(90deg); /* 画面が小さくなったときに矢印を縦向きにする */
+    }
+
+    .payee-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* 小さい画面ではグリッド幅を調整 */
+    }
+}
+</style>
+
+<script>
+// ページが読み込まれた後に実行するJavaScriptコード
+document.addEventListener('DOMContentLoaded', function() {
+    // 全ての支払いカードを取得
+    const paymentCards = document.querySelectorAll('.payment-card');
+
+    // 各支払いカードにクリックイベントを追加
+    paymentCards.forEach(function(card) {
+        card.addEventListener('click', function() {
+            // クリックされたカードのURLに遷移
+            window.location.href = card.getAttribute('data-url');
+        });
+    });
+});
+</script>
+{% endblock %}

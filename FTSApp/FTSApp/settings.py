@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account_system',
+    'warikan',
     'social_django',
 ]
 
@@ -56,7 +57,7 @@ ROOT_URLCONF = 'FTSApp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -112,19 +113,25 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ja'
 
-TIME_ZONE = 'UTC'
+# 東京のタイムゾーンに設定
+TIME_ZONE = 'Asia/Tokyo'
+
+# タイムゾーンを使用するかどうか
+USE_TZ = True
 
 USE_I18N = True
 
-USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+MEDIA_ROOT = BASE_DIR.joinpath('media')
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -157,3 +164,9 @@ SOCIAL_AUTH_LINE_SECRET = '89c67649e917c0654bc153850205bcad'
 AUTH_USER_MODEL = 'account_system.User'
 
 SOCIAL_AUTH_LINE_SCOPE = ['profile', 'openid', 'email']
+
+
+# プロジェクト全体での静的ファイルのディレクトリを指定
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]

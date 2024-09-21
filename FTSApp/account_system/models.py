@@ -23,5 +23,16 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
+    @property
+    def icon_url(self):
+        """ユーザーのアイコン画像URLを返す
+        1. SNS認証時にプロフィール画像を取得できた場合: sns_icon_url
+        2. SNS認証時にプロフィール画像を取得できなかった場合: デフォルト画像
+        """
+        if self.line_picture_url:
+            return self.line_picture_url
+        return staticfiles_storage.url("images/FTS.png")
+
+
     def __str__(self):
-        return self.email if self.email else self.username
+        return self.username

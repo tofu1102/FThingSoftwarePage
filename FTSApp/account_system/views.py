@@ -11,11 +11,11 @@ from .forms import CustomUserChangeForm
 
 class sign_in(LoginView):
     form_class = LoginForm
-    template_name = 'sign_in.html'
+    template_name = 'account_system/sign_in.html'
 
 class sign_out(LoginRequiredMixin, LogoutView):
     """ログアウトページ"""
-    template_name = 'sign_in.html'
+    template_name = 'account_system/sign_in.html'
 
 @login_required
 def account_setting(request):
@@ -27,11 +27,11 @@ def account_setting(request):
     else:
         form = CustomUserChangeForm(instance=request.user)
 
-    return render(request, 'account_settings.html', {'form': form})
+    return render(request, 'account_system/account_settings.html', {'form': form})
     
 
 def index(request):
-    return render(request, "index.html")
+    return render(request, "account_system/index.html")
 
 def sign_up(request):
     return HttpResponse("sign up")

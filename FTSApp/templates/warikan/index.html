@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}イベント一覧{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="mb-4">イベント一覧</h2>
+        <div class="row">
+            {% for event in events %}
+                <div class="col-md-6 mb-4">
+                    <a href="{% url 'warikan:event_detail' event.uuid %}" class="text-decoration-none text-dark">
+                        <div class="card">
+                            {% if event.thumbnail %}
+                            <img src="{{ event.thumbnail.url }}" class="card-img-top" alt="{{ event.name }}のサムネイル" style="object-fit: cover; height: 200px;">
+                            {% endif %}
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <h5 class="card-title mb-0" style="line-height: 1.2;">
+                                        {{ event.name }}
+                                    </h5>
+                                    <div class="ml-3 d-flex align-items-center">
+                                        {% for member in event.members.all %}
+                                            <img src="{{ member.icon_url }}" alt="LINE Icon" 
+                                                 class="rounded-circle ml-1" 
+                                                 style="border: 1px solid black; 
+                                                        height: 1.5em; 
+                                                        width: 1.5em; 
+                                                        object-fit: cover;">
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <h6 class="card-subtitle mb-2 text-muted">更新日時: {{ event.last_updated|date:"Y年n月j日 H:i" }}</h6>
+                                <p class="card-text">{{ event.description }}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ event.name }}の支払い一覧</h1>
+    <ul class="list-group">
+        {% for payment in payments %}
+        <li class="list-group-item">
+            <h5>{{ payment.name }}</h5>
+            <p>{{ payment.description }}</p>
+            <a href="{% url 'warikan:payment_detail' event.uuid payment.uuid %}" class="btn btn-primary">詳細を見る</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'warikan:event_detail' event.uuid %}" class="btn btn-secondary mt-3">イベント詳細に戻る</a>
+</div>
+{% endblock %}
