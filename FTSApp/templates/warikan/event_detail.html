@@ -3,22 +3,27 @@
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex align-items-center justify-content-between">
-        <div>
+        <div class="d-flex align-items-center">
             <h1 class="me-3">{{ event.name }}</h1>
-            <div class="d-flex">
-                {% for member in event.members.all %}
-                <img src="{{ member.icon_url }}" alt="member-icon" class="rounded-circle member-icon me-1">
-                {% endfor %}
-            </div>
-            <p>更新日時: {{ event.last_updated|date:"Y年m月d日 H:i" }}</p>
+            <button id="copyInviteLink" class="btn btn-outline-primary ms-3 position-relative">招待URL</button>
         </div>
         <a href="{% url 'warikan:confirmation' event.uuid %}" class="btn btn-success">精算確認</a>
     </div>
+    <div class="d-flex">
+        {% for member in event.members.all %}
+        <img src="{{ member.icon_url }}" alt="member-icon" class="rounded-circle member-icon me-1">
+        {% endfor %}
+    </div>
+    <p>更新日時: {{ event.last_updated|date:"Y年m月d日 H:i" }}</p>
     <p>{{ event.description }}</p>
 
     <div class="row">
         <div class="col-md-6">
-            <h2>支払い一覧</h2>
+            <h2>
+                <a href="{% url 'warikan:payment_list' event.uuid %}" style="color: inherit; text-decoration: none;">
+                    支払い一覧
+                </a>
+            </h2>
             <ul class="list-group">
                 {% for payment in latest_payments %}
                 <li class="list-group-item payment-card" data-url="{% url 'warikan:payment_detail' event.uuid payment.uuid %}">
@@ -29,7 +34,7 @@
                     </div>
                     <div class="d-flex align-items-center mt-2">
                         <img src="{{ payment.payer.icon_url }}" alt="payer-icon" class="rounded-circle icon-border me-2" width="30">
-                        <span class="fa fa-arrow-right text-primary me-2"></span> <!-- 支払い一覧の矢印: 常に右向き -->
+                        <span class="fa fa-arrow-right text-primary me-2"></span>
                         <div class="payee-box d-flex flex-wrap">
                             {% for payee in payment.payee.all %}
                             <img src="{{ payee.icon_url }}" alt="payee-icon" class="rounded-circle icon-border me-2" width="30">
@@ -57,7 +62,7 @@
                         </div>
                     </div>
                     <div class="col-md-2 text-center">
-                        <span class="fa fa-arrow-right text-primary arrow-icon-form"></span> <!-- 支払いフォームの矢印: クラスを分けて管理 -->
+                        <span class="fa fa-arrow-right text-primary arrow-icon-form"></span>
                     </div>
                     <div class="col-md-5 text-center mt-3 mt-md-0">
                         <div class="form-group">
@@ -131,13 +136,6 @@
     cursor: pointer;
 }
 
-.amount-box {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-}
-
 .payment-card:hover {
     background-color: #f8f9fa;
 }
@@ -181,6 +179,16 @@
         margin-top: 10px;
     }
 }
+
+.btn-outline-primary {
+    font-size: 0.875rem;  /* 小さめの文字サイズ */
+    padding: 0.375rem 0.75rem;
+}
+
+#copyInviteLink.copying {
+    font-size: 0.75rem;  /* コピー時の文字サイズをさらに小さく */
+    padding: 0.25rem 0.5rem;  /* パディングも調整してサイズを合わせる */
+}
 </style>
 
 <script>
@@ -190,6 +198,26 @@ document.addEventListener('DOMContentLoaded', function() {
         card.addEventListener('click', function() {
             window.location.href = card.getAttribute('data-url');
         });
+    });
+
+    const copyButton = document.getElementById('copyInviteLink');
+    const originalText = copyButton.innerHTML;
+    const inviteUrl = "{{ request.scheme }}://{{ request.get_host }}{% url 'warikan:invite' event.uuid %}";
+
+    copyButton.addEventListener('click', function() {
+        const tempInput = document.createElement('input');
+        tempInput.value = inviteUrl;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+
+        copyButton.classList.add('copying');
+        copyButton.innerHTML = "コピーしました";
+        setTimeout(function() {
+            copyButton.innerHTML = originalText;
+            copyButton.classList.remove('copying');
+        }, 2000);
     });
 });
 </script>

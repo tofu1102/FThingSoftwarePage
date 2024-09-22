@@ -6,8 +6,14 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>精算確認</h1>
-    <p>イベント: {{ event.name }}</p>
+    <!-- Display event name at the top, clickable and styled similarly to other pages -->
+    <h1>
+        <a href="{% url 'warikan:event_detail' event.uuid %}" style="color: inherit; text-decoration: none;">
+            {{ event.name }}
+        </a>
+    </h1>
+    
+    <h2>精算確認</h2>
     <p>更新日時: {{ event.last_updated|date:"Y年m月d日 H:i" }}</p>
     
     <h2>支払い精算結果</h2>
@@ -17,6 +23,7 @@
 </div>
 
 <script>
+    // Existing JavaScript code remains unchanged
     const users = {
         {% for user in event.members.all %}
         "{{ user.username }}": {

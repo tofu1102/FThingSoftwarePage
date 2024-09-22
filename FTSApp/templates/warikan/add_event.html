@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}イベント作成{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>新しいイベントを作成</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">作成</button>
+    </form>
+</div>
+{% endblock %}

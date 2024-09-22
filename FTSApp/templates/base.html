@@ -128,7 +128,7 @@
             <button class="btn btn-primary d-lg-none" type="button" id="sidebarToggle">
                 &#9776; メニュー
             </button>
-            <a class="navbar-brand" href="#">サイト名</a>
+            <a class="navbar-brand" href="{% url 'index' %}">FThingSofware</a>
             <div class="collapse navbar-collapse justify-content-end">
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}

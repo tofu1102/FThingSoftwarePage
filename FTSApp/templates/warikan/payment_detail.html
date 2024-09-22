@@ -4,7 +4,14 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>支払い詳細</h1>
+    <!-- Modify event name to look like regular text but still be a clickable link -->
+    <h1>
+        <a href="{% url 'warikan:event_detail' event.uuid %}" style="color: inherit; text-decoration: none;">
+            {{ event.name }}
+        </a>
+    </h1>
+    
+    <h2>支払い詳細</h2>
     <form method="post" enctype="multipart/form-data" class="form-container p-4 border rounded bg-light shadow-sm">
         {% csrf_token %}
         
@@ -63,7 +70,9 @@
 
         <button type="submit" class="btn btn-primary mt-3">更新する</button>
     </form>
+    <!-- Add "イベント詳細に戻る" button next to the "支払い一覧に戻る" button -->
     <a href="{% url 'warikan:payment_list' event.uuid %}" class="btn btn-secondary mt-3">支払い一覧に戻る</a>
+    <a href="{% url 'warikan:event_detail' event.uuid %}" class="btn btn-secondary mt-3 ms-2">イベント詳細に戻る</a>
 </div>
 
 <style>

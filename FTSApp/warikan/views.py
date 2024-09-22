@@ -2,7 +2,7 @@ from .models import Event, Payment
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .forms import PaymentForm
+from .forms import PaymentForm, EventForm
 from .warikan_calculater import calculate_settlement
 import json
 
@@ -79,5 +79,26 @@ def confirmation(request, uuid):
     }
     return render(request, 'warikan/confirmation.html', context)
 
+@login_required
+def add_event(request):
+    user = request.user
+    if request.method == 'POST':
+        form = EventForm(request.POST, request.FILES)
+        if form.is_valid():
+            event = form.save(commit=False)  # 一旦保存を延期
+            event.save()  # イベントを保存してから
+            event.members.add(user)  # userをmembersに追加
+            return redirect('warikan:index')
+    else:
+        form = EventForm()
+
+    return render(request, 'warikan/add_event.html', {'form': form})
+
+@login_required
+def invite(request, event_uuid):
+    user = request.user
+    event =  Event.objects.get(uuid=event_uuid)
+    event.members.add(user)
+    return redirect("warikan:index")
 
 # Create your views here.
