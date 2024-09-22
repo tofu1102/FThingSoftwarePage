@@ -15,6 +15,7 @@ def save_line_profile(backend, user, response, *args, **kwargs):
         if line_user_id:
             user.line_user_id = line_user_id
             user.line_authorized = True
+            user.email = line_user_id
         if line_display_name:
             user.line_display_name = line_display_name
             user.username = line_display_name

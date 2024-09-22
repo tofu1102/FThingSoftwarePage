@@ -20,7 +20,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)  # ユニーク制約を追加
 
     # 必須フィールドの設定
-    USERNAME_FIELD = 'line_user_id'
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
     @property
