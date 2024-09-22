@@ -7,7 +7,7 @@ class Event(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=20)
     description = models.TextField(max_length=100, blank=True)
-    last_updated = models.DateTimeField(default=timezone.now)
+    last_updated = models.DateTimeField(auto_now=True)
     members = models.ManyToManyField(User)
     registration_stopped = models.BooleanField(default=False)
     thumbnail = models.ImageField(upload_to="images/thumbnail/", blank=True)
@@ -23,7 +23,7 @@ class Payment(models.Model):
     payer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="payer")
     payee = models.ManyToManyField(User, related_name="payee")
     created_at = models.DateTimeField(default=timezone.now)
-    last_updated = models.DateTimeField(default=timezone.now)
+    last_updated = models.DateTimeField(auto_now=True)
     amount = models.IntegerField(default=0)
     receipt_image = models.ImageField(upload_to="images/receipt/", blank=True)
 

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}支払い詳細{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>支払い詳細</h1>
+    <form method="post" enctype="multipart/form-data" class="form-container p-4 border rounded bg-light shadow-sm">
+        {% csrf_token %}
+        
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-5 text-center">
+                <div class="form-group">
+                    <label for="id_payer">支払った人:</label>
+                    <div class="d-flex align-items-center">
+                        {{ form.payer }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 text-center">
+                <span class="fa fa-arrow-right text-primary arrow-icon-form"></span>
+            </div>
+            <div class="col-md-5 text-center mt-3 mt-md-0">
+                <div class="form-group">
+                    <label for="id_payee">支払われた人:</label>
+                    <div class="form-check payee-grid">
+                        {% for choice in form.payee.field.queryset %}
+                        <div class="d-flex align-items-center mb-2 payee-item">
+                            <input type="checkbox" name="payee" value="{{ choice.pk }}" class="form-check-input me-2" id="payee_{{ choice.pk }}" {% if choice.pk in form.payee.value %}checked{% endif %}>
+                            <img src="{{ choice.icon_url }}" alt="icon" class="rounded-circle icon-border me-2" width="30">
+                            <label for="payee_{{ choice.pk }}" class="form-check-label">{{ choice }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="id_name">支払い名:</label>
+            {{ form.name }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_amount">金額:</label>
+            {{ form.amount }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_description">説明:</label>
+            {{ form.description }}
+        </div>
+
+        <div class="form-group">
+            <label for="id_receipt_image">領収書の画像:</label>
+            {% if form.receipt_image.value %}
+            <div class="mb-2">
+                <img src="{{ form.receipt_image.value.url }}" alt="領収書の画像" class="img-thumbnail" style="max-width: 100%; height: auto;">
+            </div>
+            {% endif %}
+            {{ form.receipt_image }}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">更新する</button>
+    </form>
+    <a href="{% url 'warikan:payment_list' event.uuid %}" class="btn btn-secondary mt-3">支払い一覧に戻る</a>
+</div>
+
+<style>
+.form-container {
+    max-width: 100%; 
+    overflow: hidden;
+}
+
+.form-group textarea {
+    width: 100%;
+    resize: vertical;
+}
+
+.icon-border {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 2px;
+}
+
+.member-icon {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 2px;
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+}
+
+.list-group-item {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.payment-card:hover {
+    background-color: #f8f9fa;
+}
+
+.arrow-icon-form {
+    transform: rotate(0deg); 
+}
+
+.payee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+    gap: 10px; 
+}
+
+.payee-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.img-thumbnail {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 0.25rem;
+    background-color: #fff;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .arrow-icon-form {
+        transform: rotate(90deg);
+    }
+
+    .payee-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+    }
+
+    .d-flex.align-items-center.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-success {
+        width: 100%;
+        margin-top: 10px;
+    }
+}
+</style>
+
+{% endblock %}

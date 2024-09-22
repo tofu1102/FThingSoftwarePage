@@ -6,7 +6,10 @@ from account_system.models import User
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
-        fields = ['name', 'description', 'payer', 'payee', 'amount']
+        fields = ['name', 'description', 'amount', 'payer', 'payee', 'receipt_image']  # receipt_image を追加
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
 
     def __init__(self, event, *args, **kwargs):
         super(PaymentForm, self).__init__(*args, **kwargs)

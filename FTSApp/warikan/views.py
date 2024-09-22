@@ -1,9 +1,10 @@
-from django.shortcuts import render
-from .models import Event
+from .models import Event, Payment
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from .forms import PaymentForm
+from .warikan_calculater import calculate_settlement
+import json
 
 @login_required
 def index(request):
@@ -15,21 +16,27 @@ def index(request):
 @login_required
 def event_detail(request, uuid):
     event = get_object_or_404(Event, uuid=uuid)
+    latest_payments = event.payment_set.order_by('-created_at')[:5]
 
     if request.method == "POST":
-        form = PaymentForm(event, request.POST)  # eventを最初の引数として渡す
+        form = PaymentForm(event, request.POST, request.FILES)  # request.FILESを追加
         if form.is_valid():
             payment = form.save(commit=False)
             payment.event = event
             payment.save()
             form.save_m2m()  # ManyToManyフィールドを保存
-            # リダイレクトや他の処理
+            return redirect("warikan:event_detail", uuid=event.uuid)
         else:
             print("Form is invalid:", form.errors)
     else:
-        form = PaymentForm(event)  # eventを最初の引数として渡す
+        form = PaymentForm(event)
 
-    return render(request, 'warikan/event_detail.html', {'event': event, 'form': form})
+    return render(request, 'warikan/event_detail.html', {
+        'event': event,
+        'form': form,
+        'latest_payments': latest_payments
+    })
+
 
 @login_required
 def payment_list(request, event_uuid):
@@ -37,8 +44,40 @@ def payment_list(request, event_uuid):
     payments = event.payment_set.all().order_by('-created_at')
     return render(request, 'warikan/payment_list.html', {'event': event, 'payments': payments})
 
+@login_required
 def payment_detail(request, event_uuid, payment_uuid):
-    return HttpResponse("payment_detail")
+    event = Event.objects.get(uuid=event_uuid)
+    payment = get_object_or_404(Payment, uuid=payment_uuid)
+
+    if request.method == "POST":
+        form = PaymentForm(event, request.POST, request.FILES, instance=payment)
+        if form.is_valid():
+            form.save()
+            return redirect('warikan:payment_detail', event_uuid=event_uuid, payment_uuid=payment_uuid)
+    else:
+        form = PaymentForm(event, instance=payment)
+        # payeeフィールドの初期値を設定
+        form.fields['payee'].initial = payment.payee.all().values_list('uuid', flat=True)
+
+    return render(request, 'warikan/payment_detail.html', {
+        'form': form,
+        'event': payment.event
+    })
+
+
+@login_required
+def confirmation(request, uuid):
+    event = Event.objects.get(uuid=uuid)
+    settlements = calculate_settlement(event)
+    
+    # settlementsのキーをユーザーのusernameに変更
+    settlements_dict = {payer.username: {recipient.username: amount for recipient, amount in recipients.items()} for payer, recipients in settlements.items()}
+    
+    context = {
+        'event': event,
+        'settlements': json.dumps(settlements_dict),  # 修正後のsettlements_dictを渡す
+    }
+    return render(request, 'warikan/confirmation.html', context)
 
 
 # Create your views here.
