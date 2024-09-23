@@ -26,4 +26,4 @@ urlpatterns = [
     path('account/', include('account_system.urls')),
     path("auth/", include('social_django.urls', namespace='social')), 
     path("warikan/", include("warikan.urls")),
-] +  static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] +  static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
